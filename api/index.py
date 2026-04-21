@@ -31,9 +31,11 @@ scaler = None
 imputer = None
 model_columns = None
 
-@app.on_event("startup")
-async def startup_event():
+def load_models():
     global model, scaler, imputer, model_columns
+    if model is not None:
+        return
+        
     try:
         if os.path.exists(MODEL_PATH):
             model = joblib.load(MODEL_PATH)
@@ -42,7 +44,7 @@ async def startup_event():
             model_columns = joblib.load(COLUMNS_PATH)
             print("Successfully loaded ML models!")
         else:
-            print(f"Warning: Model file {MODEL_PATH} not found. Please run train_model.py first.")
+            print(f"Warning: Model file {MODEL_PATH} not found.")
     except Exception as e:
         print(f"Error loading models: {e}")
 
@@ -59,8 +61,9 @@ def read_root():
 
 @app.post("/predict")
 def predict_performance(features: VendorFeatures):
+    load_models()
     if model is None:
-        raise HTTPException(status_code=503, detail="Model not loaded. Please train the model first.")
+        raise HTTPException(status_code=503, detail="Model not loaded. Please ensure models are trained.")
         
     try:
         # Convert input to DataFrame
