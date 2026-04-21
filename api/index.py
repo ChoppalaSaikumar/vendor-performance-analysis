@@ -55,11 +55,11 @@ class VendorFeatures(BaseModel):
     Payment_Terms: str
     Region: str
 
-@app.get("/")
+@app.get("/api")
 def read_root():
-    return {"message": "Welcome to the Vendor Analysis API. Use /predict to get predictions."}
+    return {"message": "Welcome to the Vendor Analysis API. Use /api/predict to get predictions."}
 
-@app.post("/predict")
+@app.post("/api/predict")
 def predict_performance(features: VendorFeatures):
     load_models()
     if model is None:
@@ -113,7 +113,7 @@ def predict_performance(features: VendorFeatures):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@app.get("/vendors")
+@app.get("/api/vendors")
 def get_vendors():
     if not os.path.exists(DATASET_PATH):
         raise HTTPException(status_code=404, detail="Dataset not found")
@@ -127,7 +127,7 @@ def get_vendors():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/stats")
+@app.get("/api/stats")
 def get_stats():
     if not os.path.exists(DATASET_PATH):
         raise HTTPException(status_code=404, detail="Dataset not found")
