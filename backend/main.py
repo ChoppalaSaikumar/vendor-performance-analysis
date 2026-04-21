@@ -19,10 +19,12 @@ app.add_middleware(
 
 # Load ML artifacts
 # In a real app, you might want to load these dynamically or handle errors better
-MODEL_PATH = "random_forest_model.pkl"
-SCALER_PATH = "scaler.pkl"
-IMPUTER_PATH = "imputer.pkl"
-COLUMNS_PATH = "model_columns.pkl"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "random_forest_model.pkl")
+SCALER_PATH = os.path.join(BASE_DIR, "scaler.pkl")
+IMPUTER_PATH = os.path.join(BASE_DIR, "imputer.pkl")
+COLUMNS_PATH = os.path.join(BASE_DIR, "model_columns.pkl")
+DATASET_PATH = os.path.join(BASE_DIR, "vendor_dataset.csv")
 
 model = None
 scaler = None
@@ -110,12 +112,11 @@ def predict_performance(features: VendorFeatures):
 
 @app.get("/vendors")
 def get_vendors():
-    dataset_path = '../vendor_dataset.csv'
-    if not os.path.exists(dataset_path):
+    if not os.path.exists(DATASET_PATH):
         raise HTTPException(status_code=404, detail="Dataset not found")
     
     try:
-        df = pd.read_csv(dataset_path)
+        df = pd.read_csv(DATASET_PATH)
         # Fill NaN with None for JSON compatibility
         df = df.where(pd.notnull(df), None)
         # Limit to 100 for performance if needed, but 200 is fine
@@ -125,12 +126,11 @@ def get_vendors():
 
 @app.get("/stats")
 def get_stats():
-    dataset_path = '../vendor_dataset.csv'
-    if not os.path.exists(dataset_path):
+    if not os.path.exists(DATASET_PATH):
         raise HTTPException(status_code=404, detail="Dataset not found")
     
     try:
-        df = pd.read_csv(dataset_path)
+        df = pd.read_csv(DATASET_PATH)
         
         # Performance distribution
         df['Performance_Class'] = pd.cut(df['Performance_Score'], bins=[0, 4, 7, 10], labels=['Low', 'Medium', 'High'], include_lowest=True)

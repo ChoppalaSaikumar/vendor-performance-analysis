@@ -20,8 +20,8 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const [statsRes, vendorsRes] = await Promise.all([
-        fetch('http://localhost:8000/stats'),
-        fetch('http://localhost:8000/vendors')
+        fetch('/api/stats'),
+        fetch('/api/vendors')
       ]);
 
       if (!statsRes.ok || !vendorsRes.ok) throw new Error('Failed to fetch dashboard data');
